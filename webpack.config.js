@@ -1,6 +1,9 @@
 const glob = require('glob')
-
+const path = require('path');
+const {CleanWebpackPlugin} = require("clean-webpack-plugin")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
+const VueLoaderPlugin = require("vue-loader/lib/plugin")
+
 
 var htmlPages= glob.sync('./src/*.html')
 .map(path => {
@@ -24,28 +27,28 @@ module.exports = {
 
     output:{
         filename: 'js/[name]/[name].js',
-        chunkFilename:'js/[name].js'
+        chunkFilename:'js/[name].js',
+        path:path.resolve(__dirname,'dist')
     },
-
+devServer:{
+    contentBase:path.resolve(__dirname,'dist','pages')
+},
     optimization:{
         splitChunks:{
             chunks:'all',
             name:'vendor'
         }
     },
-
+module:{
+    rules:[
+        {
+            test:/\.vue$/,
+            loader:'vue-loader'
+        }
+    ]
+},
     plugins:[
-        // new HtmlWebpackPlugin({
-        //     template:'./src/index.html',
-        //     filename:'pages/index.html',
-        //     chunks:['index','vendor'],
-        //     inject:true
-        // }),
-        // new HtmlWebpackPlugin({
-        //     template:'./src/about.html',
-        //     filename:'pages/about.html',
-        //     chunks:['about','vendor'],
-        //     inject:true
-        // })
+        // new CleanWebpackPlugin(),
+        new VueLoaderPlugin()
     ].concat(htmlPages)
 }
